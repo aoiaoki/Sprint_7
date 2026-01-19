@@ -1,20 +1,43 @@
 import allure
-from helpers.courier import register_new_courier_and_return_login_password, login_courier
+from api.courier_api import login_courier
 
 @allure.feature("Логин курьера")
 class TestLoginCourier:
 
-    def test_login_success(self):
-        courier = register_new_courier_and_return_login_password()
+    @allure.title("Курьер может авторизоваться")
+    def test_login_success(self, courier):
+        payload, _ = courier
 
-        response = login_courier(courier["login"], courier["password"])
+        response = login_courier({
+            "login": payload["login"],
+            "password": payload["password"]
+        })
 
         assert response.status_code == 200
         assert "id" in response.json()
 
-    def test_login_wrong_password(self):
-        courier = register_new_courier_and_return_login_password()
+    @allure.title("Ошибка при неверном пароле")
+    def test_login_wrong_password(self, courier):
+        payload, _ = courier
 
-        response = login_courier(courier["login"], "wrong")
+        response = login_courier({
+            "login": payload["login"],
+            "password": "wrong"
+        })
 
         assert response.status_code == 404
+
+    @allure.title("Ошибка при логине несуществующего пользователя")
+    def test_login_nonexistent_user(self):
+        response = login_courier({
+            "login": "no_user",
+            "password": "1234"
+        })
+
+        assert response.status_code == 404
+
+    @allure.title("Ошибка если не передан логин")
+    def test_login_without_login(self):
+        response = login_courier({"password": "1234"})
+
+        assert response.status_code == 400
