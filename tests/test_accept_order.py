@@ -1,10 +1,5 @@
 import allure
-from api.order_api import (
-    create_order,
-    accept_order,
-    cancel_order,
-    get_order_by_track
-)
+from api.order_api import create_order, accept_order, cancel_order, get_order_by_track
 
 @allure.feature("Принятие заказа")
 class TestAcceptOrder:

@@ -11,13 +11,22 @@ class TestCreateCourier:
         assert response.status_code == 201
         assert response.json() == {"ok": True}
 
-    @allure.title("Нельзя создать двух одинаковых курьеров")
+    @allure.title("Нельзя создать двух курьеров с одинаковым логином")
     def test_create_duplicate_courier(self, courier_payload):
-        create_courier(courier_payload)
-        response = create_courier(courier_payload)
+        payload_1 = courier_payload
+        payload_2 = {
+            "login": payload_1["login"],
+            "password": "another_password",
+            "firstName": "another_name"
+        }
 
+        create_courier(payload_1)
+        response = create_courier(payload_2)
+
+        body = response.json()
         assert response.status_code == 409
-        assert "message" in response.json()
+        assert "message" in body
+        assert "логин" in body["message"].lower()
 
     @allure.title("Нельзя создать курьера без логина")
     def test_create_courier_without_login(self):

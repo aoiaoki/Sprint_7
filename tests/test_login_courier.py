@@ -1,4 +1,6 @@
 import allure
+import pytest
+import requests
 from api.courier_api import login_courier
 
 @allure.feature("Логин курьера")
@@ -13,8 +15,9 @@ class TestLoginCourier:
             "password": payload["password"]
         })
 
+        body = response.json()
         assert response.status_code == 200
-        assert "id" in response.json()
+        assert isinstance(body["id"], int)
 
     @allure.title("Ошибка при неверном пароле")
     def test_login_wrong_password(self, courier):
@@ -29,12 +32,17 @@ class TestLoginCourier:
 
     @allure.title("Ошибка при логине несуществующего пользователя")
     def test_login_nonexistent_user(self):
-        response = login_courier({
-            "login": "no_user",
-            "password": "1234"
-        })
+        try:
+            response = login_courier({
+                "login": "no_user",
+                "password": "1234"
+            })
+        except requests.exceptions.RequestException:
+            pytest.skip("Стенд недоступен")
 
+        body = response.json()
         assert response.status_code == 404
+        assert "message" in body
 
     @allure.title("Ошибка если не передан логин")
     def test_login_without_login(self):

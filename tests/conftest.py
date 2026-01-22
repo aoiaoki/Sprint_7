@@ -1,29 +1,10 @@
 import pytest
 import random
 import string
-from api.courier_api import create_courier, login_courier, delete_courier
+from api.courier_api import create_courier, delete_courier, get_courier_id
 
 def random_string():
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
-
-@pytest.fixture
-def courier():
-    payload = {
-        "login": random_string(),
-        "password": random_string(),
-        "firstName": random_string()
-    }
-    create_courier(payload)
-
-    response = login_courier({
-        "login": payload["login"],
-        "password": payload["password"]
-    })
-    courier_id = response.json()["id"]
-
-    yield payload, courier_id
-
-    delete_courier(courier_id)
 
 @pytest.fixture
 def courier_payload():
@@ -32,3 +13,16 @@ def courier_payload():
         "password": random_string(),
         "firstName": random_string()
     }
+
+@pytest.fixture
+def courier(courier_payload):
+    create_courier(courier_payload)
+    courier_id = get_courier_id(courier_payload)
+
+    yield courier_payload, courier_id
+
+    try:
+        delete_courier(courier_id)
+    except Exception:
+        pass
+

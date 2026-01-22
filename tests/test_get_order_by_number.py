@@ -9,10 +9,11 @@ class TestGetOrderByNumber:
         response = create_order()
         track = response.json()["track"]
 
-        order_response = get_order_by_track(track)
+        response = get_order_by_track(track)
+        body = response.json()
 
-        assert order_response.status_code == 200
-        assert "order" in order_response.json()
+        assert response.status_code == 200
+        assert body["order"]["id"] > 0
 
         cancel_order(track)
 
