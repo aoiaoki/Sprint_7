@@ -21,8 +21,4 @@ def courier(courier_payload):
 
     yield courier_payload, courier_id
 
-    try:
-        delete_courier(courier_id)
-    except Exception:
-        pass
-
+    delete_courier(courier_id)

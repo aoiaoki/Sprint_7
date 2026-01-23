@@ -15,7 +15,7 @@ class TestCreateCourier:
     def test_create_duplicate_courier(self, courier_payload):
         payload_1 = courier_payload
         payload_2 = {
-            "login": payload_1["login"],
+            "login": payload_1["login"],  # тот же логин
             "password": "another_password",
             "firstName": "another_name"
         }

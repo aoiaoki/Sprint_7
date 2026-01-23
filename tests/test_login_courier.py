@@ -32,13 +32,10 @@ class TestLoginCourier:
 
     @allure.title("Ошибка при логине несуществующего пользователя")
     def test_login_nonexistent_user(self):
-        try:
-            response = login_courier({
-                "login": "no_user",
-                "password": "1234"
-            })
-        except requests.exceptions.RequestException:
-            pytest.skip("Стенд недоступен")
+        response = login_courier({
+            "login": "no_user",
+            "password": "1234"
+        })
 
         body = response.json()
         assert response.status_code == 404
